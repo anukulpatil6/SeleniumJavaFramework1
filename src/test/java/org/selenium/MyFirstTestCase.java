@@ -13,11 +13,11 @@ import java.time.Duration;
 public class MyFirstTestCase {
 
     @Test
-    public void dummyTest(){
+    public void guestCheckOutUsingDirectBankTransfer() throws InterruptedException {
 //        System.setProperty("webdriver.chrome.driver","C:\\Users\\LENOVO\\Downloads\\chromedriver-win64\\chromedriver.exe");
         WebDriver driver = new ChromeDriver();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+//        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.get("https://askomdch.com");
         driver.manage().window().maximize();
         driver.findElement(By.cssSelector("li[id='menu-item-1227'] a[class='menu-link']")).click();
@@ -26,7 +26,8 @@ public class MyFirstTestCase {
         Assert.assertEquals(driver.findElement(By.cssSelector(".woocommerce-products-header__title.page-title")).getText(),"Search results: “BLUE”");
         driver.findElement(By.cssSelector("a[aria-label='Add “Blue Shoes” to your cart']")).click();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[title='View cart']")));
+//        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[title='View cart']")));
+        Thread.sleep(5000);
         driver.findElement(By.cssSelector("a[title='View cart']")).click();
 
         Assert.assertEquals(driver.findElement(By.cssSelector("td[class='product-name'] a")).getText(),"Blue Shoes");
@@ -41,7 +42,57 @@ public class MyFirstTestCase {
         driver.findElement(By.id("billing_email")).sendKeys("askomsch@gmail.com");
         driver.findElement(By.id("place_order")).click();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".woocommerce-notice")));
+//        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".woocommerce-notice")));
+        Thread.sleep(5000);
+        Assert.assertEquals((driver.findElement(By.cssSelector(".woocommerce-notice")).getText()),"Thank you. Your order has been received.");
+        driver.close();
+        driver.quit();
+    }
+    @Test
+    public void loginAndCheckOutUsingDirectBankTransfer() throws InterruptedException {
+//        System.setProperty("webdriver.chrome.driver","C:\\Users\\LENOVO\\Downloads\\chromedriver-win64\\chromedriver.exe");
+        WebDriver driver = new ChromeDriver();
+
+//        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        driver.get("https://askomdch.com");
+        driver.manage().window().maximize();
+        driver.findElement(By.cssSelector("li[id='menu-item-1227'] a[class='menu-link']")).click();
+        driver.findElement(By.id("woocommerce-product-search-field-0")).sendKeys("BLUE");
+        driver.findElement(By.cssSelector("button[value='Search']")).click();
+        Assert.assertEquals(driver.findElement(By.cssSelector(".woocommerce-products-header__title.page-title")).getText(),"Search results: “BLUE”");
+        driver.findElement(By.cssSelector("a[aria-label='Add “Blue Shoes” to your cart']")).click();
+
+//        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a[title='View cart']")));
+        Thread.sleep(5000);
+        driver.findElement(By.cssSelector("a[title='View cart']")).click();
+
+        Assert.assertEquals(driver.findElement(By.cssSelector("td[class='product-name'] a")).getText(),"Blue Shoes");
+        driver.findElement(By.cssSelector(".checkout-button")).click();
+
+        //login
+        driver.findElement(By.cssSelector(".showlogin")).click();
+        driver.findElement(By.cssSelector("#username")).sendKeys("demo2User");
+        driver.findElement(By.cssSelector("#password")).sendKeys("demopwd");
+        driver.findElement(By.cssSelector("button[value='Login']")).click();
+
+
+
+
+        driver.findElement(By.id("billing_first_name")).sendKeys("demo");
+        driver.findElement(By.id("billing_last_name")).sendKeys("user");
+        driver.findElement(By.id("billing_address_1")).sendKeys("San francisco");
+        driver.findElement(By.id("billing_city")).sendKeys("San francisco");
+
+        driver.findElement(By.id("billing_postcode")).clear();
+        driver.findElement(By.id("billing_postcode")).sendKeys("94188");
+
+//        clear the mail field to write new mail id
+        driver.findElement(By.id("billing_email")).clear();
+        driver.findElement(By.id("billing_email")).sendKeys("askomsch@gmail.com");
+        driver.findElement(By.id("place_order")).click();
+
+//        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".woocommerce-notice")));
+        Thread.sleep(5000);
         Assert.assertEquals((driver.findElement(By.cssSelector(".woocommerce-notice")).getText()),"Thank you. Your order has been received.");
 
     }
