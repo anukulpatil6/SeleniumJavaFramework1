@@ -1,7 +1,9 @@
 package org.selenium.pom.pages;
 
+import jdk.jfr.consumer.RecordedThread;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.selenium.pom.base.BasePage;
 
 public class StorePage extends BasePage {
@@ -18,19 +20,34 @@ public class StorePage extends BasePage {
     }
 
     public StorePage enterTextInSearchFld(String txt){
-        driver.findElement(searchFld).sendKeys(txt);
+//        BEFORE EXPLICIT WAIT
+//        driver.findElement(searchFld).sendKeys(txt);
+
+//        AFTER EXPLICIT WAIT
+        wait.until(ExpectedConditions.visibilityOfElementLocated(searchFld)).sendKeys(txt);
         return this;
     }
     public StorePage clickSearchBtn(){
-        driver.findElement(searchBtn).click();
+//        driver.findElement(searchBtn).click();
+
+//        AFTER EXPLICIT WAIT
+        wait.until(ExpectedConditions.elementToBeClickable(searchBtn)).click();
+
+
         return this;
     }
+//    public Boolean isLoaded(){
+//        return  wait.until(ExpectedConditions.urlContains("/store"));
+//    }
     public StorePage search(String txt){
         enterTextInSearchFld(txt).clickSearchBtn();
         return this;
     }
     public String getTitle(){
-        return driver.findElement(title).getText();
+//        return driver.findElement(title).getText();
+
+//        AFTER EXPLICIT WAIT
+        return  wait.until(ExpectedConditions.visibilityOfElementLocated(title)).getText();
     }
 
     private By getAddToCartBtnElement(String productName){
@@ -39,12 +56,17 @@ public class StorePage extends BasePage {
     }
     public StorePage clickAddToCartBtn(String productName){
        By addToCartBtn= getAddToCartBtnElement(productName);
-        driver.findElement(addToCartBtn).click();
+//        driver.findElement(addToCartBtn).click();
+
+        //        AFTER EXPLICIT WAIT
+        wait.until(ExpectedConditions.elementToBeClickable(addToCartBtn)).click();
         return this;
     }
 
     public CartPage clickViewCart(){
-        driver.findElement(viewCartLink).click();
+//        driver.findElement(viewCartLink).click();
+        wait.until(ExpectedConditions.elementToBeClickable(viewCartLink)).click();
+
         return new CartPage(driver);
 
     }

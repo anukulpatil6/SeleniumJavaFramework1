@@ -2,22 +2,34 @@ package org.selenium;
 
 import org.openqa.selenium.By;
 import org.selenium.pom.base.BaseTest;
+import org.selenium.pom.objects.BillingAddress;
+import org.selenium.pom.objects.Product;
+import org.selenium.pom.objects.User;
 import org.selenium.pom.pages.CartPage;
 import org.selenium.pom.pages.CheckOutPage;
 import org.selenium.pom.pages.HomePage;
 import org.selenium.pom.pages.StorePage;
+import org.selenium.pom.utils.JacksonUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class MyFirstTestCase extends BaseTest {
 
     @Test
-    public void guestCheckOutUsingDirectBankTransfer() throws InterruptedException {
+    public void guestCheckOutUsingDirectBankTransfer() throws InterruptedException, IOException {
+
+        String searchFor = "Blue";
 //        System.setProperty("webdriver.chrome.driver","C:\\Users\\LENOVO\\Downloads\\chromedriver-win64\\chromedriver.exe");
 //        WebDriver driver = new ChromeDriver();
 ////        driver.manage().window().maximize();
 ////        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        StorePage storePage = new HomePage(driver).load().navigateToStoreUsingMenu().search("BLUE");
+        StorePage storePage = new HomePage(driver).
+                load().
+                navigateToStoreUsingMenu().
+                search(searchFor);
 
 //        driver.get("https://askomdch.com");
 //
@@ -30,11 +42,51 @@ public class MyFirstTestCase extends BaseTest {
 ////                clickSearchBtn();
 ////        above is structural page object
 
-        Assert.assertEquals(storePage.getTitle(),"Search results: “BLUE”");
-        storePage.clickAddToCartBtn("Blue Shoes");
-        Thread.sleep(5000);
+        /*Billing address way */
+/*     BILLING ADDRESS WITH BILLING ADDRESS CLASS GETTER SETTER AND CHECKOUT PAGE FUNCTION
+        BillingAddress billingAddress = new BillingAddress();
+        billingAddress.setFirstName("demo");
+        billingAddress.setLastName("user");
+        billingAddress.setAddressLineOne("San francisco");
+        billingAddress.setCity("San francisco");
+        billingAddress.setPostalCode("94188");
+        billingAddress.setEmail("askomsch@gmail.com"); */
+
+        /*
+         *structural page object
+          BillingAddress billingAddress = new BillingAddress();
+          billingAddress.setFirstName("demo").
+                  setLastName("user").
+                  setAddressLineOne("San francisco").
+                  setCity("San francisco").
+                  setPostalCode("94188").
+                  setEmail("askomsch@gmail.com");
+        */
+
+
+
+        /*BILLING ADDRESS WITH CONSTRUCTOR
+        BillingAddress billingAddress= new BillingAddress("demo","user","San francisco","San francisco","94188","askomsch@gmail.com");
+*/
+/*       BILLING ADDRESS WITH JSON
+        BillingAddress billingAddress = new BillingAddress();
+        InputStream is = getClass().getClassLoader().getResourceAsStream("myBillingAddress.json");
+        billingAddress = JacksonUtils.deserializeJson(is,billingAddress);
+*/
+//Make it generic
+        BillingAddress billingAddress = JacksonUtils.deserializeJson("myBillingAddress.json",BillingAddress.class);
+
+        Product product= new Product(1215);
+
+        Assert.assertEquals(storePage.getTitle(),"Search results: “"+ searchFor +"”");
+//        storePage.clickAddToCartBtn("Blue Shoes");
+        storePage.clickAddToCartBtn(product.getName());
+//     implicit wait use kar liya hia
+//        Thread.sleep(5000);
        CartPage cartPage= storePage.clickViewCart();
-        Assert.assertEquals(cartPage.getProductName(), "Blue Shoes");
+//        Assert.assertEquals(cartPage.getProductName(), "Blue Shoes");
+        Assert.assertEquals(cartPage.getProductName(), product.getName());
+
         CheckOutPage checkOutPage= cartPage.clickCheckOutBtn();
 
 //
@@ -55,15 +107,20 @@ public class MyFirstTestCase extends BaseTest {
 
 //        CheckoutPage
 
+//        checkOutPage.
+//                enterFirstName("demo").
+//                enterLastName("user").
+//                enterAddressLineOne("San francisco").
+//                enterCity("San francisco").
+//                enterPostCode("94188").
+//                enterEmail("askomsch@gmail.com").
+//                placeOrder();
+
         checkOutPage.
-                enterFirstName("demo").
-                enterLastName("user").
-                enterAddressLineOne("San francisco").
-                enterCity("San francisco").
-                enterPostCode("94188").
-                enterEmail("askomsch@gmail.com").
+                setBillingAddress(billingAddress).
+                selectDirectBankTransfer().
                 placeOrder();
-        Thread.sleep(5000);
+//        Thread.sleep(5000);
         Assert.assertEquals(checkOutPage.getNotice(),"Thank you. Your order has been received.");
 
 //        driver.findElement(By.id("billing_first_name")).sendKeys("demo");
@@ -80,23 +137,36 @@ public class MyFirstTestCase extends BaseTest {
 
     }
     @Test
-    public void loginAndCheckOutUsingDirectBankTransfer() throws InterruptedException {
+    public void loginAndCheckOutUsingDirectBankTransfer() throws InterruptedException, IOException {
+
+        String searchFor = "Blue";
+
 //        System.setProperty("webdriver.chrome.driver","C:\\Users\\LENOVO\\Downloads\\chromedriver-win64\\chromedriver.exe");
 //        WebDriver driver = new ChromeDriver();
 //        driver.manage().window().maximize();
 
 //        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        driver.get("https://askomdch.com");
+//        driver.get("https://askomdch.com");
 
-        HomePage homepage = new HomePage(driver);
+        StorePage storePage = new HomePage(driver).
+                load().
+                navigateToStoreUsingMenu().
+                search(searchFor);
+ /*       HomePage homepage = new HomePage(driver);
         StorePage storepage = homepage.navigateToStoreUsingMenu();
         storepage.search("BLUE");
-        Assert.assertEquals(storepage.getTitle(),"Search results: “BLUE”");
-        storepage.clickAddToCartBtn("Blue Shoes");
-        Thread.sleep(5000);
+  */
+        Product product = new Product(1215);
+        Assert.assertEquals(storePage.getTitle(),"Search results: “"+ searchFor +"”");
+//        storePage.clickAddToCartBtn("Blue Shoes");
+        storePage.clickAddToCartBtn(product.getName());
 
-        CartPage cartPage = storepage.clickViewCart();
-        Assert.assertEquals(cartPage.getProductName(),"Blue Shoes");
+//        Thread.sleep(5000);
+
+        CartPage cartPage = storePage.clickViewCart();
+//        Assert.assertEquals(cartPage.getProductName(),"Blue Shoes");
+        Assert.assertEquals(cartPage.getProductName(),product.getName());
+
         CheckOutPage checkOutPage = cartPage.clickCheckOutBtn();
 
 
@@ -114,17 +184,25 @@ public class MyFirstTestCase extends BaseTest {
 //        Assert.assertEquals(driver.findElement(By.cssSelector("td[class='product-name'] a")).getText(),"Blue Shoes");
 //        driver.findElement(By.cssSelector(".checkout-button")).click();
         checkOutPage.clickHereToLoginLink();
-        Thread.sleep(5000);
-        checkOutPage.login("demo2User","demopwd")
-                .enterFirstName("demo").
-                enterLastName("user").
-                enterAddressLineOne("San francisco").
-                enterCity("San francisco").
-                enterPostCode("94188").
-                enterEmail("askomsch@gmail.com").
+//        Thread.sleep(5000);
+        User user = new User("demo2User","demopwd");
+        checkOutPage.login(user.getUsername(),user.getPassword());
+//        checkOutPage.login("demo2User","demopwd")
+//                .enterFirstName("demo").
+//                enterLastName("user").
+//                enterAddressLineOne("San francisco").
+//                enterCity("San francisco").
+//                enterPostCode("94188").
+//                enterEmail("askomsch@gmail.com").
+//                placeOrder();
+
+        BillingAddress billingAddress= JacksonUtils.deserializeJson("myBillingAddress.json",BillingAddress.class);
+        checkOutPage.
+                setBillingAddress(billingAddress).
+                selectDirectBankTransfer().
                 placeOrder();
 
-        Thread.sleep(5000);
+//        Thread.sleep(5000);
         Assert.assertEquals(checkOutPage.getNotice(),"Thank you. Your order has been received.");
 
 
